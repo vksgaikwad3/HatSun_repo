@@ -26,6 +26,10 @@ class sim900_GPRS
     float hextofloat(uint16_t hByte, uint16_t lByte); 
     boolean httpGETupdate(String channelKey,float field1,float field2,float field3,float field4,float field5,float field6,float field7,float field8);  
     void httpInit();
+    void  SendMessage();
+    void GPRSFailedSMS(String mobileNum,String message);
+    void GPRSFailedSMS();
+    
   private:
 
   
