@@ -1,4 +1,5 @@
 #include "sim900.h"
+#include <avr/wdt.h>
 
 //Note: response[1000] array contains all the response of GSM AT Commands 
 
@@ -7,8 +8,9 @@
 char aux_str[100];
     
 char pin[]="";
-//char apn[]="imis/internet";     //idea
+//char apn[]="imis/internet";     //idea Vodaphone APN = "www"
 char apn[]="airtelgprs.com";     //Airtel
+
 
 char user_name[]="";
 char password[]="";
@@ -289,6 +291,8 @@ void sim900_GPRS::updateThinkSpeak(String channel_apiKey,uint8_t id1,uint8_t id2
                 sendATcommand("AT+CSQ=?", "OK", 1000);
                 while(sendATcommand2("AT+CIPSHUT", "OK", "ERROR", 10000) != 1);
                 delay(5000); 
+                GPRSFailedSMS("+918983537961","GPRS Connection Failed");        // SMS GPRS connecion Problem
+                wdt_enable(WDTO_8S);    // Enable Watchdog Reset 
           }
         }         //AT+CSTT APN,PSW,PORT setting
        }          //AT+CIPMUX =0  Single-connection mode
@@ -296,6 +300,7 @@ void sim900_GPRS::updateThinkSpeak(String channel_apiKey,uint8_t id1,uint8_t id2
     Serial.println("Shutting down the connection.........");
     sendATcommand2("AT+CIPSHUT", "OK", "ERROR", 5000);
     delay(5000);
+    //wdt_enable(WDTO_8S);    // Enable Watchdog Reset
 }
 
 
@@ -467,5 +472,54 @@ boolean sim900_GPRS::httpGETupdate(String channelKey,float field1,float field2,f
  delay(5000);Serial.println("");
  Serial.println(" ***************************** DONE ***************************");
 
+}
+
+/******************************************Send SMS *****************************/
+
+void sim900_GPRS::SendMessage()
+{
+  Serial1.println("AT+CMGF=1");    //Sets the GSM Module in Text Mode
+  delay(1000);  // Delay of 1000 milli seconds or 1 second
+  Serial1.println("AT+CMGS=\"+918983537961\"\r"); // Replace x with mobile number
+  delay(1000);
+  Serial1.println("Device is Power ON in Dhamodharhalli, Tamil Nadu");// The SMS text you want to send
+  delay(100);
+//  Serial1.write(0x1A);
+//  Serial1.write(0x0D);
+//  Serial1.write(0x0A);
+  Serial1.println((char)26);// ASCII code of CTRL+Z
+  delay(100);
+}
+
+/********************************* SMS Alerts to Anyone ************************/
+void sim900_GPRS::GPRSFailedSMS(String mobileNum,String message)
+{
+  Serial1.println("AT+CMGF=1");    //Sets the GSM Module in Text Mode
+  delay(1000);  // Delay of 1000 milli seconds or 1 second
+  Serial1.println("AT+CMGS="+ mobileNum +"\r"); // Replace x with mobile number
+  delay(1000);
+  Serial1.println(message);// The SMS text you want to send
+  delay(100);
+//  Serial1.write(0x1A);
+//  Serial1.write(0x0D);
+//  Serial1.write(0x0A);
+  Serial1.println((char)26);// ASCII code of CTRL+Z
+  delay(100);
+}
+
+/********************************* SMS on GPRS Failed ************************/
+void sim900_GPRS::GPRSFailedSMS()
+{
+  Serial1.println("AT+CMGF=1");    //Sets the GSM Module in Text Mode
+  delay(1000);  // Delay of 1000 milli seconds or 1 second
+  Serial1.println("AT+CMGS=\"+918983537961\"\r"); // Replace x with mobile number
+  delay(1000);
+  Serial1.println("GPRS Connection Failed, Retrying to connect, at Dhamodharhalli Tamil Nadu");// The SMS text you want to send
+  delay(100);
+//  Serial1.write(0x1A);
+//  Serial1.write(0x0D);
+//  Serial1.write(0x0A);
+  Serial1.println((char)26);// ASCII code of CTRL+Z
+  delay(100);
 }
 
