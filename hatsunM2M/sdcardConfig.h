@@ -7,13 +7,13 @@
 File myFile;
 
  
-volatile const int chipSelect  = 10;
+volatile const int chipSelect  = 53;
 void isSDCardCheck(String filename);
 void readSDCard(String filename);
-boolean writetoSDCard (String filename,byte mode,String logTime,int deviceID,float battery_Temp,float milk_Temp,float auxillary_Temp,float battery_Volt,float ac_Volt,float compressor_Current,float pump_Current,
+boolean writetoSDCard (String filename,byte mode,String logTime,int deviceID1,float battery_Temp,float milk_Temp,float auxillary_Temp,float battery_Volt,float ac_Volt,float compressor_Current,float pump_Current,
                        boolean charg_pump_Relay,boolean condensor_Relay,boolean compressor_Relay,boolean inverter_Relay,boolean agitator_Relay,boolean tank_Relay,boolean shiva_Relay,boolean discharge_pump_Relay,float compressor_run_Hour,
-                       float lineVolts,float lineCurrent,float deviceVolts,float deviceCurrent,float power,float powerConsump,float deviceRunHr,float powerAvailable);
-
+                       int deviceID2,float em2_line1_Volts,float em2_line2_Volts,float em2_line3_Volts,float em2_line1_Current,float em2_line2_Current,float em2_line3_Current,
+                       float em2_W1_Watt, float em2_W2_Watt, float em2_W3_Watt,float em2_VA1,float em2_VA2, float em2_VA3,float KVAh_Reading,float em2_PF1,float em2_PF2,float em2_PF3,float em2_PF_Avg, float kWh_Reading,float em2_powerAvailableTime);
  
 boolean isSDCardexist(String filename);
 
@@ -42,7 +42,7 @@ void isSDCardCheck(String filename)
     if(myFile.size() <= 0)    //check Size of file is zero or not
     {
      Serial.println("Start Writting Tabs !!! .");
-     myFile.println("Time.,DeviceID,BatteryTemp(oC),MilkTemp(oC),AuxillaryTemp(oC),BatteryVoltage(VDC),ACVoltage(ACV),CompresorCurrent(A),PumpCurrent(A),ChargingPumpRelay,CondensorRelay,CompressorRelay,InverterRelay,AgitatorRelay,TankRelay,ShivaRelay,Disch.PumpRelay,CompressorRunHours ");
+     myFile.println("Date,Time,DeviceID,BatteryTemp(oC),MilkTemp(oC),AuxillaryTemp(oC),BatteryVoltage(VDC),ACVoltage(ACV),CompresorCurrent(A),PumpCurrent(A),ChargingPumpRelay,CondensorRelay,CompressorRelay,InverterRelay,AgitatorRelay,TankRelay,ShivaRelay,Disch.PumpRelay,CompressorRunHours, \tDeviceID,Line1_Volts[VAC],Line2_Volts[VAC],Line3_Volts[VAC],Line1_Current[A],Line2_Current[A],Line3_Current[A],W1_Watt,W2_Watt,W3_Watt,VA1,VA2,VA3,KVAh_Reading,PF1,PF2,PF3,PF_Avg,kWh_Reading,PowerAvailableTime[Hours], \tDeviceID,LineVolts[VAC],LineCurrent[A],Power[W],PowerConsump[kWh],DeviceRunHr[Hrs],PowerAvailable[W],VA_Average");
     
      myFile.close();
     }
@@ -85,7 +85,7 @@ void isSDCardCheck(String filename)
     {
       Serial.print("File Size:");Serial.println(myFile.size());
       Serial.print("Create Tabs in .csv...");
-      myFile.println("Time,DeviceID,BatteryTemp(oC),MilkTemp(oC),AuxillaryTemp(oC),BatteryVoltage(VDC),ACVoltage(ACV),CompresorCurrent(A),PumpCurrent(A),ChargingPumpRelay,CondensorRelay,CompressorRelay,InverterRelay,AgitatorRelay,TankRelay,ShivaRelay,Disch.PumpRelay,CompressorRunHours,\tDeviceID,LineVolts[VAC],LineCurrent[A],DeviceVolts[VDC],DeviceCurrent[A],Power[W],PowerConsump[kWh],DeviceRunHr[Hrs],PowerAvailable[W]");
+      myFile.println("Date,Time,DeviceID,BatteryTemp(oC),MilkTemp(oC),AuxillaryTemp(oC),BatteryVoltage(VDC),ACVoltage(ACV),CompresorCurrent(A),PumpCurrent(A),ChargingPumpRelay,CondensorRelay,CompressorRelay,InverterRelay,AgitatorRelay,TankRelay,ShivaRelay,Disch.PumpRelay,CompressorRunHours, \tDeviceID,Line1_Volts[VAC],Line2_Volts[VAC],Line3_Volts[VAC],Line1_Current[A],Line2_Current[A],Line3_Current[A],W1_Watt,W2_Watt,W3_Watt,VA1,VA2,VA3,KVAh_Reading,PF1,PF2,PF3,PF_Avg,kWh_Reading,PowerAvailableTime[Hours],\tDeviceID,LineVolts[VAC],LineCurrent[A],Power[W],PowerConsump[kWh],DeviceRunHr[Hrs],PowerAvailable[W],VA_Average");
       myFile.close();
       Serial.println("Write Complete .");
    }
@@ -149,7 +149,9 @@ void readSDCard(String filename)
 
 boolean writetoSDCard (String filename,byte mode,String logTime,int deviceID1,float battery_Temp,float milk_Temp,float auxillary_Temp,float battery_Volt,float ac_Volt,float compressor_Current,float pump_Current,
                        boolean charg_pump_Relay,boolean condensor_Relay,boolean compressor_Relay,boolean inverter_Relay,boolean agitator_Relay,boolean tank_Relay,boolean shiva_Relay,boolean discharge_pump_Relay,float compressor_run_Hour,
-                       int deviceID2,float lineVolts,float lineCurrent,float deviceVolts,float deviceCurrent,float power,float powerConsump,float deviceRunHr,float powerAvailable)
+                       int deviceID2,float em2_line1_Volts,float em2_line2_Volts,float em2_line3_Volts,float em2_line1_Current,float em2_line2_Current,float em2_line3_Current,
+                       float em2_W1_Watt, float em2_W2_Watt, float em2_W3_Watt,float em2_VA1,float em2_VA2, float em2_VA3,float KVAh_Reading,float em2_PF1,float em2_PF2,float em2_PF3,float em2_PF_Avg, float kWh_Reading,float em2_powerAvailableTime,
+                       int deviceID3,float em3_lineVolts, float em3_lineCurrent,float em3_powerFactor,float em3_power, float em3_deviceRunHr,float em3_powerAvailableTime,float em3_VA_Avg)
 {
   //volatile int srNo = 1;
   String data ="" ;
@@ -194,25 +196,73 @@ boolean writetoSDCard (String filename,byte mode,String logTime,int deviceID1,fl
     data += discharge_pump_Relay ;
     data += "," ;
     data += compressor_run_Hour;
-    data += "\t\t";
+    data += "\t\t\t";
     data += deviceID2;
     data += ",";
-    data += lineVolts;
+    data += em2_line1_Volts;
     data += ",";
-    data += deviceVolts;
+    data += em2_line2_Volts;
     data += ",";
-    data += lineCurrent;
+    data += em2_line3_Volts;
     data += ",";
-    data += deviceCurrent;
+    data += em2_line1_Current;
     data += ",";
-    data += power;
+    data += em2_line2_Current;
     data += ",";
-    data += powerConsump;
+    data += em2_line3_Current;
     data += ",";
-    data += deviceRunHr;
+    data += em2_W1_Watt;
     data += ",";
-    data += powerAvailable;
-     
+    data += em2_W2_Watt;
+    data += ",";
+    data += em2_W3_Watt;
+    data += ",";
+    //data += em2_Watt_Avg;
+    //data += ",";
+    data += em2_VA1;
+    data += ",";
+    data += em2_VA2;
+    data += ",";
+    data += em2_VA3;
+    data += ",";
+   // data += em2_VA_Avg;
+   // data += ",";
+    data += KVAh_Reading;
+    data += ",";
+    data += em2_PF1;
+    data += ",";
+    data += em2_PF2;
+    data += ",";
+    data += em2_PF3;
+    data += ",";
+    data += em2_PF_Avg;
+    data += ",";
+    data += kWh_Reading;
+    data += ",";
+   // data += em2_powerConsump;
+   // data += ",";
+    //data += em2_deviceRunHr;
+    //data += ",";
+    data += em2_powerAvailableTime;
+    data +=  "\t\t";
+    data +=  deviceID3;
+    data += ",";
+    data += em3_lineVolts;
+    data += ",";
+    data += em3_lineCurrent;
+    data += ",";
+    data += em3_powerFactor;
+    data += ",";
+    data += em3_power;
+    data += ",";
+    data += em3_deviceRunHr;
+    data += ",";
+    data += em3_powerAvailableTime;
+    data += ",";
+    data += em3_VA_Avg;
+    
+    
+    
     //srNo++;
   Serial.print("File Status:");Serial.println(myFile);
   if(myFile)
